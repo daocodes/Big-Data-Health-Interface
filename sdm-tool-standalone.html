@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,69 +11,83 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
             background: white;
         }
+
         .header {
             border-bottom: 3px solid #000;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
+
         .header h1 {
             font-size: 24px;
             font-weight: bold;
         }
+
         .header-controls {
             margin-top: 10px;
         }
+
         .header-controls label {
             margin-right: 10px;
             font-size: 14px;
             font-weight: bold;
         }
+
         .header-controls select {
             padding: 6px 12px;
             font-size: 14px;
             border: 2px solid #000;
             font-weight: bold;
         }
+
         .two-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
         }
+
         .box {
             border: 2px solid #333;
             padding: 15px;
             margin-bottom: 20px;
         }
+
         .box h2 {
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
         }
+
         .priority-bar {
             margin-bottom: 10px;
         }
+
         .priority-label {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
             margin-bottom: 3px;
         }
+
         .priority-bar-bg {
             width: 100%;
             height: 18px;
             background: #e8e8e8;
             border: 1px solid #999;
         }
+
         .priority-bar-fill {
             height: 100%;
             background: #888;
             transition: width 0.3s ease;
         }
+
         .recommendation-box {
             font-size: 22px;
             font-weight: bold;
@@ -82,72 +97,87 @@
             margin-bottom: 10px;
             background: #f8f8f8;
         }
+
         .treatment-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 15px;
         }
+
         .treatment-col {
             padding: 12px;
         }
+
         .treatment-col.surgery {
+            border: 2px solid #005a9c;
+            background: #eef6fc;
+        }
+
+        .treatment-col.conservative {
             border: 2px solid #2d7a4f;
             background: #f0f8f4;
         }
-        .treatment-col.conservative {
-            border: 2px solid #8b4513;
-            background: #f8f4f0;
-        }
+
         .treatment-col-title {
             font-size: 14px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 10px;
         }
+
         .treatment-col.surgery .treatment-col-title {
+            color: #005a9c;
+        }
+
+        .treatment-col.conservative .treatment-col-title {
             color: #2d7a4f;
         }
-        .treatment-col.conservative .treatment-col-title {
-            color: #8b4513;
-        }
+
         .contrib-bar {
             margin-bottom: 10px;
         }
+
         .contrib-label {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
             margin-bottom: 3px;
         }
+
         .contrib-bar-bg {
             width: 100%;
             height: 16px;
             background: #e8e8e8;
             border: 1px solid #999;
         }
+
         .contrib-bar-fill {
             height: 100%;
             transition: width 0.3s ease;
         }
+
         .contrib-bar-fill.surgery {
+            background: #3a8fd5;
+        }
+
+        .contrib-bar-fill.conservative {
             background: #6fa87d;
         }
-        .contrib-bar-fill.conservative {
-            background: #c99a6e;
-        }
+
         input[type="range"] {
             width: 100%;
             margin-bottom: 8px;
         }
     </style>
 </head>
+
 <body>
     <div id="app">Loading...</div>
 
     <script>
         // Patient data
-        const PATIENTS_DATA = [{"id":1,"preferences":{"WP1":24.73,"WP2":5.85,"WP3":31.73,"WP4":26.27,"WP5":11.43},"treatmentEffects":{"TE1":0.1747,"TE2":-0.2029,"TE3":0.3342,"TE4":7.1233,"TE5":19333.26}},{"id":2,"preferences":{"WP1":33.66,"WP2":18.34,"WP3":13.55,"WP4":15.01,"WP5":19.43},"treatmentEffects":{"TE1":0.3616,"TE2":-0.3539,"TE3":0.2811,"TE4":5.7154,"TE5":24671.26}},{"id":3,"preferences":{"WP1":28.98,"WP2":14.8,"WP3":35.79,"WP4":5.72,"WP5":14.71},"treatmentEffects":{"TE1":0.3929,"TE2":-0.3378,"TE3":0.3153,"TE4":7.0759,"TE5":24661.57}},{"id":4,"preferences":{"WP1":49.94,"WP2":7.64,"WP3":23.41,"WP4":7.86,"WP5":11.15},"treatmentEffects":{"TE1":0.1782,"TE2":-0.1146,"TE3":0.2273,"TE4":6.1102,"TE5":16675.19}},{"id":5,"preferences":{"WP1":23.7,"WP2":21.66,"WP3":24.35,"WP4":19.19,"WP5":11.09},"treatmentEffects":{"TE1":0.2752,"TE2":-0.1416,"TE3":0.1071,"TE4":4.1876,"TE5":12670.96}},{"id":6,"preferences":{"WP1":18.91,"WP2":19.43,"WP3":35.14,"WP4":18.23,"WP5":8.29},"treatmentEffects":{"TE1":0.4621,"TE2":-0.2758,"TE3":0.1981,"TE4":4.5565,"TE5":13997.07}},{"id":7,"preferences":{"WP1":34.76,"WP2":12.42,"WP3":28.04,"WP4":21.03,"WP5":3.75},"treatmentEffects":{"TE1":0.3399,"TE2":-0.1902,"TE3":0.1658,"TE4":4.3868,"TE5":14006.03}},{"id":8,"preferences":{"WP1":25.86,"WP2":10.54,"WP3":38.11,"WP4":2.55,"WP5":22.93},"treatmentEffects":{"TE1":0.032,"TE2":-0.0024,"TE3":0.0142,"TE4":4.8673,"TE5":16657.3}},{"id":9,"preferences":{"WP1":25.42,"WP2":15.46,"WP3":44.75,"WP4":8.99,"WP5":5.37},"treatmentEffects":{"TE1":0.2679,"TE2":-0.2761,"TE3":0.2387,"TE4":4.2338,"TE5":15338.93}},{"id":10,"preferences":{"WP1":22.58,"WP2":5.17,"WP3":38.0,"WP4":17.15,"WP5":17.1},"treatmentEffects":{"TE1":0.1696,"TE2":-0.0974,"TE3":0.2697,"TE4":6.8465,"TE5":18005.24}},{"id":11,"preferences":{"WP1":34.62,"WP2":13.47,"WP3":22.21,"WP4":26.48,"WP5":3.22},"treatmentEffects":{"TE1":0.2695,"TE2":-0.2526,"TE3":0.4029,"TE4":7.1318,"TE5":22000.52}},{"id":12,"preferences":{"WP1":45.17,"WP2":5.81,"WP3":19.38,"WP4":24.67,"WP5":4.98},"treatmentEffects":{"TE1":0.1933,"TE2":-0.2357,"TE3":0.2351,"TE4":6.285,"TE5":16671.96}},{"id":13,"preferences":{"WP1":35.69,"WP2":6.29,"WP3":31.45,"WP4":12.35,"WP5":14.22},"treatmentEffects":{"TE1":0.2098,"TE2":-0.0858,"TE3":0.1939,"TE4":5.8812,"TE5":22000.34}},{"id":14,"preferences":{"WP1":32.66,"WP2":7.23,"WP3":38.01,"WP4":17.21,"WP5":4.89},"treatmentEffects":{"TE1":0.1967,"TE2":-0.2277,"TE3":0.307,"TE4":6.4291,"TE5":25998.88}},{"id":15,"preferences":{"WP1":28.54,"WP2":20.39,"WP3":25.71,"WP4":18.79,"WP5":6.57},"treatmentEffects":{"TE1":0.4959,"TE2":-0.2681,"TE3":0.3635,"TE4":5.9238,"TE5":19334.18}},{"id":16,"preferences":{"WP1":40.72,"WP2":10.56,"WP3":30.36,"WP4":6.24,"WP5":12.12},"treatmentEffects":{"TE1":0.2693,"TE2":-0.1379,"TE3":0.2627,"TE4":5.0032,"TE5":17998.73}},{"id":17,"preferences":{"WP1":30.46,"WP2":16.67,"WP3":20.97,"WP4":17.74,"WP5":14.16},"treatmentEffects":{"TE1":0.1396,"TE2":-0.177,"TE3":0.2132,"TE4":5.1235,"TE5":21992.39}},{"id":18,"preferences":{"WP1":41.69,"WP2":11.96,"WP3":34.53,"WP4":3.78,"WP5":8.04},"treatmentEffects":{"TE1":0.3031,"TE2":-0.2952,"TE3":0.2593,"TE4":6.4734,"TE5":16668.96}},{"id":19,"preferences":{"WP1":27.35,"WP2":26.11,"WP3":37.56,"WP4":2.33,"WP5":6.65},"treatmentEffects":{"TE1":0.2008,"TE2":-0.252,"TE3":0.4063,"TE4":8.0781,"TE5":28655.78}},{"id":20,"preferences":{"WP1":23.16,"WP2":15.26,"WP3":37.46,"WP4":17.33,"WP5":6.8},"treatmentEffects":{"TE1":0.401,"TE2":-0.2349,"TE3":0.2068,"TE4":4.3392,"TE5":14002.4}}];
+        const PATIENTS_DATA = [{ "id": 1, "preferences": { "WP1": 24.73, "WP2": 5.85, "WP3": 31.73, "WP4": 26.27, "WP5": 11.43 }, "treatmentEffects": { "TE1": 0.1747, "TE2": -0.2029, "TE3": 0.3342, "TE4": 7.1233, "TE5": 19333.26 } }, { "id": 2, "preferences": { "WP1": 33.66, "WP2": 18.34, "WP3": 13.55, "WP4": 15.01, "WP5": 19.43 }, "treatmentEffects": { "TE1": 0.3616, "TE2": -0.3539, "TE3": 0.2811, "TE4": 5.7154, "TE5": 24671.26 } }, { "id": 3, "preferences": { "WP1": 28.98, "WP2": 14.8, "WP3": 35.79, "WP4": 5.72, "WP5": 14.71 }, "treatmentEffects": { "TE1": 0.3929, "TE2": -0.3378, "TE3": 0.3153, "TE4": 7.0759, "TE5": 24661.57 } }, { "id": 4, "preferences": { "WP1": 49.94, "WP2": 7.64, "WP3": 23.41, "WP4": 7.86, "WP5": 11.15 }, "treatmentEffects": { "TE1": 0.1782, "TE2": -0.1146, "TE3": 0.2273, "TE4": 6.1102, "TE5": 16675.19 } }, { "id": 5, "preferences": { "WP1": 23.7, "WP2": 21.66, "WP3": 24.35, "WP4": 19.19, "WP5": 11.09 }, "treatmentEffects": { "TE1": 0.2752, "TE2": -0.1416, "TE3": 0.1071, "TE4": 4.1876, "TE5": 12670.96 } }, { "id": 6, "preferences": { "WP1": 18.91, "WP2": 19.43, "WP3": 35.14, "WP4": 18.23, "WP5": 8.29 }, "treatmentEffects": { "TE1": 0.4621, "TE2": -0.2758, "TE3": 0.1981, "TE4": 4.5565, "TE5": 13997.07 } }, { "id": 7, "preferences": { "WP1": 34.76, "WP2": 12.42, "WP3": 28.04, "WP4": 21.03, "WP5": 3.75 }, "treatmentEffects": { "TE1": 0.3399, "TE2": -0.1902, "TE3": 0.1658, "TE4": 4.3868, "TE5": 14006.03 } }, { "id": 8, "preferences": { "WP1": 25.86, "WP2": 10.54, "WP3": 38.11, "WP4": 2.55, "WP5": 22.93 }, "treatmentEffects": { "TE1": 0.032, "TE2": -0.0024, "TE3": 0.0142, "TE4": 4.8673, "TE5": 16657.3 } }, { "id": 9, "preferences": { "WP1": 25.42, "WP2": 15.46, "WP3": 44.75, "WP4": 8.99, "WP5": 5.37 }, "treatmentEffects": { "TE1": 0.2679, "TE2": -0.2761, "TE3": 0.2387, "TE4": 4.2338, "TE5": 15338.93 } }, { "id": 10, "preferences": { "WP1": 22.58, "WP2": 5.17, "WP3": 38.0, "WP4": 17.15, "WP5": 17.1 }, "treatmentEffects": { "TE1": 0.1696, "TE2": -0.0974, "TE3": 0.2697, "TE4": 6.8465, "TE5": 18005.24 } }, { "id": 11, "preferences": { "WP1": 34.62, "WP2": 13.47, "WP3": 22.21, "WP4": 26.48, "WP5": 3.22 }, "treatmentEffects": { "TE1": 0.2695, "TE2": -0.2526, "TE3": 0.4029, "TE4": 7.1318, "TE5": 22000.52 } }, { "id": 12, "preferences": { "WP1": 45.17, "WP2": 5.81, "WP3": 19.38, "WP4": 24.67, "WP5": 4.98 }, "treatmentEffects": { "TE1": 0.1933, "TE2": -0.2357, "TE3": 0.2351, "TE4": 6.285, "TE5": 16671.96 } }, { "id": 13, "preferences": { "WP1": 35.69, "WP2": 6.29, "WP3": 31.45, "WP4": 12.35, "WP5": 14.22 }, "treatmentEffects": { "TE1": 0.2098, "TE2": -0.0858, "TE3": 0.1939, "TE4": 5.8812, "TE5": 22000.34 } }, { "id": 14, "preferences": { "WP1": 32.66, "WP2": 7.23, "WP3": 38.01, "WP4": 17.21, "WP5": 4.89 }, "treatmentEffects": { "TE1": 0.1967, "TE2": -0.2277, "TE3": 0.307, "TE4": 6.4291, "TE5": 25998.88 } }, { "id": 15, "preferences": { "WP1": 28.54, "WP2": 20.39, "WP3": 25.71, "WP4": 18.79, "WP5": 6.57 }, "treatmentEffects": { "TE1": 0.4959, "TE2": -0.2681, "TE3": 0.3635, "TE4": 5.9238, "TE5": 19334.18 } }, { "id": 16, "preferences": { "WP1": 40.72, "WP2": 10.56, "WP3": 30.36, "WP4": 6.24, "WP5": 12.12 }, "treatmentEffects": { "TE1": 0.2693, "TE2": -0.1379, "TE3": 0.2627, "TE4": 5.0032, "TE5": 17998.73 } }, { "id": 17, "preferences": { "WP1": 30.46, "WP2": 16.67, "WP3": 20.97, "WP4": 17.74, "WP5": 14.16 }, "treatmentEffects": { "TE1": 0.1396, "TE2": -0.177, "TE3": 0.2132, "TE4": 5.1235, "TE5": 21992.39 } }, { "id": 18, "preferences": { "WP1": 41.69, "WP2": 11.96, "WP3": 34.53, "WP4": 3.78, "WP5": 8.04 }, "treatmentEffects": { "TE1": 0.3031, "TE2": -0.2952, "TE3": 0.2593, "TE4": 6.4734, "TE5": 16668.96 } }, { "id": 19, "preferences": { "WP1": 27.35, "WP2": 26.11, "WP3": 37.56, "WP4": 2.33, "WP5": 6.65 }, "treatmentEffects": { "TE1": 0.2008, "TE2": -0.252, "TE3": 0.4063, "TE4": 8.0781, "TE5": 28655.78 } }, { "id": 20, "preferences": { "WP1": 23.16, "WP2": 15.26, "WP3": 37.46, "WP4": 17.33, "WP5": 6.8 }, "treatmentEffects": { "TE1": 0.401, "TE2": -0.2349, "TE3": 0.2068, "TE4": 4.3392, "TE5": 14002.4 } }];
 
         // State
         let selectedPatient = PATIENTS_DATA[0];
@@ -167,7 +197,11 @@
             const c5 = (preferences.WP5 / 100) * (-treatmentEffects.TE5) * 1;
 
             netUtility = c1 + c2 + c3 + c4 + c5;
-            recommendation = netUtility > 0 ? 'Surgery' : 'Conservative Care';
+            // recommendation value is kept plain text for logic
+            const recText = netUtility > 0 ? 'Surgery' : 'Conservative Care';
+            const recColor = netUtility > 0 ? '#005a9c' : '#2d7a4f';
+            recommendation = `<span style="color: ${recColor};">${recText}</span>`;
+
             contributions = {
                 pain: c1,
                 treatmentPain: c2,
@@ -211,11 +245,11 @@
             ];
 
             const contribData = [
-                {label: 'Pain Relief', value: contributions.pain},
-                {label: 'Treatment Pain', value: contributions.treatmentPain},
-                {label: 'Function', value: contributions.function},
-                {label: 'Recovery Time', value: contributions.rehabTime},
-                {label: 'Cost', value: contributions.cost}
+                { label: 'Pain Relief', value: contributions.pain },
+                { label: 'Treatment Pain', value: contributions.treatmentPain },
+                { label: 'Function', value: contributions.function },
+                { label: 'Recovery Time', value: contributions.rehabTime },
+                { label: 'Cost', value: contributions.cost }
             ];
 
             const maxAbs = Math.max(...contribData.map(c => Math.abs(c.value)));
@@ -223,8 +257,8 @@
             const topPriority = Math.max(pref.WP1, pref.WP3, pref.WP4, pref.WP5);
             const topPriorityName =
                 pref.WP3 === topPriority ? 'function' :
-                pref.WP4 === topPriority ? 'recovery time' :
-                pref.WP1 === topPriority ? 'pain relief' : 'cost';
+                    pref.WP4 === topPriority ? 'recovery time' :
+                        pref.WP1 === topPriority ? 'pain relief' : 'cost';
 
             document.getElementById('app').innerHTML = `
                 <div class="header">
@@ -302,7 +336,7 @@
                                     ${te.TE1 > 0.05 ? `<div>• Pain: Surgery ${te.TE1 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE1 * 10).toFixed(1)} points)</div>` : ''}
                                     ${te.TE3 > 0.05 ? `<div>• Function: Surgery ${te.TE3 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE3 * 10).toFixed(1)} points)</div>` : ''}
                                     ${te.TE4 > 1 ? `<div>• Recovery: Surgery +${te.TE4.toFixed(0)} more weeks</div>` : ''}
-                                    ${te.TE5 > 2000 ? `<div>• Cost: Surgery +$${(te.TE5/1000).toFixed(0)}K more</div>` : ''}
+                                    ${te.TE5 > 2000 ? `<div>• Cost: Surgery +$${(te.TE5 / 1000).toFixed(0)}K more</div>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -317,14 +351,14 @@
                                 How each outcome influences the recommendation:
                             </div>
                             ${contribData.map(c => {
-                                const absValue = Math.abs(c.value);
-                                const widthPercent = maxAbs > 0 ? (absValue / maxAbs) * 100 : 0;
-                                const favorsSurgery = c.value > 0;
-                                return `
+                const absValue = Math.abs(c.value);
+                const widthPercent = maxAbs > 0 ? (absValue / maxAbs) * 100 : 0;
+                const favorsSurgery = c.value > 0;
+                return `
                                     <div class="contrib-bar">
                                         <div class="contrib-label">
                                             <span>${c.label}</span>
-                                            <span style="font-weight: bold; color: ${favorsSurgery ? '#2d7a4f' : '#8b4513'};">
+                                            <span style="font-weight: bold; color: ${favorsSurgery ? '#005a9c' : '#2d7a4f'};">
                                                 ${favorsSurgery ? 'Favors Surgery' : 'Favors Conservative'}
                                             </span>
                                         </div>
@@ -333,7 +367,7 @@
                                         </div>
                                     </div>
                                 `;
-                            }).join('')}
+            }).join('')}
                             <div style="border: 2px solid #000; padding: 10px; background: white; margin-top: 15px;">
                                 <div style="font-size: 13px; font-weight: bold;">Overall: ${recommendation}</div>
                                 <div style="font-size: 11px; margin-top: 3px; color: #666;">Based on weighted patient priorities and treatment effects</div>
@@ -375,9 +409,9 @@
                             </div>
                             <div style="border: ${isSensitive ? '2px solid #d4a017' : '1px solid #333'}; background: ${isSensitive ? '#fef9e7' : '#f8f8f8'}; padding: 10px; font-size: 12px;">
                                 ${isSensitive ?
-                                    `<div><strong>⚠️ Sensitive:</strong> Recommendation changes with time valuation (try moving slider)</div>` :
-                                    `<div><strong>✓ Stable:</strong> Recommendation stays ${recommendation} regardless of time valuation</div>`
-                                }
+                    `<div><strong>⚠️ Sensitive:</strong> Recommendation changes with time valuation (try moving slider)</div>` :
+                    `<div><strong>✓ Stable:</strong> Recommendation stays ${recommendation} regardless of time valuation</div>`
+                }
                             </div>
                         </div>
                     </div>
@@ -400,4 +434,5 @@
         render();
     </script>
 </body>
+
 </html>
