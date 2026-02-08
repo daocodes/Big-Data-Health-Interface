@@ -1,236 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSK Treatment Decision Support</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: white; }
+        .header { border-bottom: 3px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; font-weight: bold; }
+        .header-sub { font-size: 12px; color: #666; margin-top: 2px; }
+        .header-controls { margin-top: 10px; display: flex; align-items: center; gap: 15px; }
+        .header-controls label { font-size: 14px; font-weight: bold; }
+        .header-controls select { padding: 6px 12px; font-size: 14px; border: 2px solid #000; font-weight: bold; }
+        .header-controls button { padding: 6px 16px; font-size: 14px; font-weight: bold; border: 2px solid #000; background: white; cursor: pointer; }
+        .header-controls button.active-tab { background: #000; color: white; }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .box { border: 2px solid #333; padding: 15px; margin-bottom: 20px; }
+        .box h2 { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
+        .chip-row { display: flex; align-items: center; margin-bottom: 10px; gap: 8px; }
+        .chip-row label { font-size: 12px; min-width: 140px; font-weight: bold; }
+        .chip-row input[type="range"] { flex: 1; margin: 0; }
+        .chip-row .chip-value { font-size: 13px; font-weight: bold; min-width: 36px; text-align: right; }
+        .chip-total { text-align: right; font-size: 13px; font-weight: bold; margin-top: 5px; padding-top: 8px; border-top: 1px solid #999; }
+        .generate-btn { display: block; width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #000; color: white; border: 2px solid #000; cursor: pointer; margin-top: 10px; }
+        .generate-btn:disabled { background: #999; border-color: #999; cursor: not-allowed; }
+        .priority-bar { margin-bottom: 10px; }
+        .priority-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+        .priority-bar-bg { width: 100%; height: 18px; background: #e8e8e8; border: 1px solid #999; }
+        .priority-bar-fill { height: 100%; background: #888; transition: width 0.3s ease; }
+        .recommendation-box { font-size: 22px; font-weight: bold; padding: 15px 0; text-align: center; border: 2px solid #000; margin-bottom: 10px; background: #f8f8f8; }
+        .treatment-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .treatment-col { padding: 12px; }
+        .treatment-col.surgery { border: 2px solid #2d7a4f; background: #f0f8f4; }
+        .treatment-col.conservative { border: 2px solid #8b4513; background: #f8f4f0; }
+        .treatment-col-title { font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+        .treatment-col.surgery .treatment-col-title { color: #2d7a4f; }
+        .treatment-col.conservative .treatment-col-title { color: #8b4513; }
+        .contrib-bar { margin-bottom: 10px; }
+        .contrib-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px; }
+        .contrib-bar-bg { width: 100%; height: 16px; background: #e8e8e8; border: 1px solid #999; }
+        .contrib-bar-fill { height: 100%; transition: width 0.3s ease; }
+        .contrib-bar-fill.surgery { background: #6fa87d; }
+        .contrib-bar-fill.conservative { background: #c99a6e; }
+        input[type="range"] { width: 100%; margin-bottom: 8px; }
 
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: white;
-        }
-
-        .header {
-            border-bottom: 3px solid #000;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .header-controls {
-            margin-top: 10px;
-        }
-
-        .header-controls label {
-            margin-right: 10px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .header-controls select {
-            padding: 6px 12px;
-            font-size: 14px;
-            border: 2px solid #000;
-            font-weight: bold;
-        }
-
-        .two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .box {
-            border: 2px solid #333;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .box h2 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .priority-bar {
-            margin-bottom: 10px;
-        }
-
-        .priority-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 3px;
-        }
-
-        .priority-bar-bg {
-            width: 100%;
-            height: 18px;
-            background: #e8e8e8;
-            border: 1px solid #999;
-        }
-
-        .priority-bar-fill {
-            height: 100%;
-            background: #888;
-            transition: width 0.3s ease;
-        }
-
-        .recommendation-box {
-            font-size: 22px;
-            font-weight: bold;
-            padding: 15px 0;
-            text-align: center;
-            border: 2px solid #000;
-            margin-bottom: 10px;
-            background: #f8f8f8;
-        }
-
-        .treatment-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .treatment-col {
-            padding: 12px;
-        }
-
-        .treatment-col.surgery {
-            border: 2px solid #005a9c;
-            background: #eef6fc;
-        }
-
-        .treatment-col.conservative {
-            border: 2px solid #2d7a4f;
-            background: #f0f8f4;
-        }
-
-        .treatment-col-title {
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .treatment-col.surgery .treatment-col-title {
-            color: #005a9c;
-        }
-
-        .treatment-col.conservative .treatment-col-title {
-            color: #2d7a4f;
-        }
-
-        .contrib-bar {
-            margin-bottom: 10px;
-        }
-
-        .contrib-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 3px;
-        }
-
-        .contrib-bar-bg {
-            width: 100%;
-            height: 16px;
-            background: #e8e8e8;
-            border: 1px solid #999;
-        }
-
-        .contrib-bar-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        .contrib-bar-fill.surgery {
-            background: #3a8fd5;
-        }
-
-        .contrib-bar-fill.conservative {
-            background: #6fa87d;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            margin-bottom: 8px;
-        }
     </style>
 </head>
-
 <body>
     <div id="app">Loading...</div>
-
     <script>
-        // Patient data
-        const PATIENTS_DATA = [{ "id": 1, "preferences": { "WP1": 24.73, "WP2": 5.85, "WP3": 31.73, "WP4": 26.27, "WP5": 11.43 }, "treatmentEffects": { "TE1": 0.1747, "TE2": -0.2029, "TE3": 0.3342, "TE4": 7.1233, "TE5": 19333.26 } }, { "id": 2, "preferences": { "WP1": 33.66, "WP2": 18.34, "WP3": 13.55, "WP4": 15.01, "WP5": 19.43 }, "treatmentEffects": { "TE1": 0.3616, "TE2": -0.3539, "TE3": 0.2811, "TE4": 5.7154, "TE5": 24671.26 } }, { "id": 3, "preferences": { "WP1": 28.98, "WP2": 14.8, "WP3": 35.79, "WP4": 5.72, "WP5": 14.71 }, "treatmentEffects": { "TE1": 0.3929, "TE2": -0.3378, "TE3": 0.3153, "TE4": 7.0759, "TE5": 24661.57 } }, { "id": 4, "preferences": { "WP1": 49.94, "WP2": 7.64, "WP3": 23.41, "WP4": 7.86, "WP5": 11.15 }, "treatmentEffects": { "TE1": 0.1782, "TE2": -0.1146, "TE3": 0.2273, "TE4": 6.1102, "TE5": 16675.19 } }, { "id": 5, "preferences": { "WP1": 23.7, "WP2": 21.66, "WP3": 24.35, "WP4": 19.19, "WP5": 11.09 }, "treatmentEffects": { "TE1": 0.2752, "TE2": -0.1416, "TE3": 0.1071, "TE4": 4.1876, "TE5": 12670.96 } }, { "id": 6, "preferences": { "WP1": 18.91, "WP2": 19.43, "WP3": 35.14, "WP4": 18.23, "WP5": 8.29 }, "treatmentEffects": { "TE1": 0.4621, "TE2": -0.2758, "TE3": 0.1981, "TE4": 4.5565, "TE5": 13997.07 } }, { "id": 7, "preferences": { "WP1": 34.76, "WP2": 12.42, "WP3": 28.04, "WP4": 21.03, "WP5": 3.75 }, "treatmentEffects": { "TE1": 0.3399, "TE2": -0.1902, "TE3": 0.1658, "TE4": 4.3868, "TE5": 14006.03 } }, { "id": 8, "preferences": { "WP1": 25.86, "WP2": 10.54, "WP3": 38.11, "WP4": 2.55, "WP5": 22.93 }, "treatmentEffects": { "TE1": 0.032, "TE2": -0.0024, "TE3": 0.0142, "TE4": 4.8673, "TE5": 16657.3 } }, { "id": 9, "preferences": { "WP1": 25.42, "WP2": 15.46, "WP3": 44.75, "WP4": 8.99, "WP5": 5.37 }, "treatmentEffects": { "TE1": 0.2679, "TE2": -0.2761, "TE3": 0.2387, "TE4": 4.2338, "TE5": 15338.93 } }, { "id": 10, "preferences": { "WP1": 22.58, "WP2": 5.17, "WP3": 38.0, "WP4": 17.15, "WP5": 17.1 }, "treatmentEffects": { "TE1": 0.1696, "TE2": -0.0974, "TE3": 0.2697, "TE4": 6.8465, "TE5": 18005.24 } }, { "id": 11, "preferences": { "WP1": 34.62, "WP2": 13.47, "WP3": 22.21, "WP4": 26.48, "WP5": 3.22 }, "treatmentEffects": { "TE1": 0.2695, "TE2": -0.2526, "TE3": 0.4029, "TE4": 7.1318, "TE5": 22000.52 } }, { "id": 12, "preferences": { "WP1": 45.17, "WP2": 5.81, "WP3": 19.38, "WP4": 24.67, "WP5": 4.98 }, "treatmentEffects": { "TE1": 0.1933, "TE2": -0.2357, "TE3": 0.2351, "TE4": 6.285, "TE5": 16671.96 } }, { "id": 13, "preferences": { "WP1": 35.69, "WP2": 6.29, "WP3": 31.45, "WP4": 12.35, "WP5": 14.22 }, "treatmentEffects": { "TE1": 0.2098, "TE2": -0.0858, "TE3": 0.1939, "TE4": 5.8812, "TE5": 22000.34 } }, { "id": 14, "preferences": { "WP1": 32.66, "WP2": 7.23, "WP3": 38.01, "WP4": 17.21, "WP5": 4.89 }, "treatmentEffects": { "TE1": 0.1967, "TE2": -0.2277, "TE3": 0.307, "TE4": 6.4291, "TE5": 25998.88 } }, { "id": 15, "preferences": { "WP1": 28.54, "WP2": 20.39, "WP3": 25.71, "WP4": 18.79, "WP5": 6.57 }, "treatmentEffects": { "TE1": 0.4959, "TE2": -0.2681, "TE3": 0.3635, "TE4": 5.9238, "TE5": 19334.18 } }, { "id": 16, "preferences": { "WP1": 40.72, "WP2": 10.56, "WP3": 30.36, "WP4": 6.24, "WP5": 12.12 }, "treatmentEffects": { "TE1": 0.2693, "TE2": -0.1379, "TE3": 0.2627, "TE4": 5.0032, "TE5": 17998.73 } }, { "id": 17, "preferences": { "WP1": 30.46, "WP2": 16.67, "WP3": 20.97, "WP4": 17.74, "WP5": 14.16 }, "treatmentEffects": { "TE1": 0.1396, "TE2": -0.177, "TE3": 0.2132, "TE4": 5.1235, "TE5": 21992.39 } }, { "id": 18, "preferences": { "WP1": 41.69, "WP2": 11.96, "WP3": 34.53, "WP4": 3.78, "WP5": 8.04 }, "treatmentEffects": { "TE1": 0.3031, "TE2": -0.2952, "TE3": 0.2593, "TE4": 6.4734, "TE5": 16668.96 } }, { "id": 19, "preferences": { "WP1": 27.35, "WP2": 26.11, "WP3": 37.56, "WP4": 2.33, "WP5": 6.65 }, "treatmentEffects": { "TE1": 0.2008, "TE2": -0.252, "TE3": 0.4063, "TE4": 8.0781, "TE5": 28655.78 } }, { "id": 20, "preferences": { "WP1": 23.16, "WP2": 15.26, "WP3": 37.46, "WP4": 17.33, "WP5": 6.8 }, "treatmentEffects": { "TE1": 0.401, "TE2": -0.2349, "TE3": 0.2068, "TE4": 4.3392, "TE5": 14002.4 } }];
+        const PATIENTS_DATA = [{"id":1,"preferences":{"WP1":24.73,"WP2":5.85,"WP3":31.73,"WP4":26.27,"WP5":11.43},"treatmentEffects":{"TE1":0.1747,"TE2":-0.2029,"TE3":0.3342,"TE4":7.1233,"TE5":19333.26}},{"id":2,"preferences":{"WP1":33.66,"WP2":18.34,"WP3":13.55,"WP4":15.01,"WP5":19.43},"treatmentEffects":{"TE1":0.3616,"TE2":-0.3539,"TE3":0.2811,"TE4":5.7154,"TE5":24671.26}},{"id":3,"preferences":{"WP1":28.98,"WP2":14.8,"WP3":35.79,"WP4":5.72,"WP5":14.71},"treatmentEffects":{"TE1":0.3929,"TE2":-0.3378,"TE3":0.3153,"TE4":7.0759,"TE5":24661.57}},{"id":4,"preferences":{"WP1":49.94,"WP2":7.64,"WP3":23.41,"WP4":7.86,"WP5":11.15},"treatmentEffects":{"TE1":0.1782,"TE2":-0.1146,"TE3":0.2273,"TE4":6.1102,"TE5":16675.19}},{"id":5,"preferences":{"WP1":23.7,"WP2":21.66,"WP3":24.35,"WP4":19.19,"WP5":11.09},"treatmentEffects":{"TE1":0.2752,"TE2":-0.1416,"TE3":0.1071,"TE4":4.1876,"TE5":12670.96}},{"id":6,"preferences":{"WP1":18.91,"WP2":19.43,"WP3":35.14,"WP4":18.23,"WP5":8.29},"treatmentEffects":{"TE1":0.4621,"TE2":-0.2758,"TE3":0.1981,"TE4":4.5565,"TE5":13997.07}},{"id":7,"preferences":{"WP1":34.76,"WP2":12.42,"WP3":28.04,"WP4":21.03,"WP5":3.75},"treatmentEffects":{"TE1":0.3399,"TE2":-0.1902,"TE3":0.1658,"TE4":4.3868,"TE5":14006.03}},{"id":8,"preferences":{"WP1":25.86,"WP2":10.54,"WP3":38.11,"WP4":2.55,"WP5":22.93},"treatmentEffects":{"TE1":0.032,"TE2":-0.0024,"TE3":0.0142,"TE4":4.8673,"TE5":16657.3}},{"id":9,"preferences":{"WP1":25.42,"WP2":15.46,"WP3":44.75,"WP4":8.99,"WP5":5.37},"treatmentEffects":{"TE1":0.2679,"TE2":-0.2761,"TE3":0.2387,"TE4":4.2338,"TE5":15338.93}},{"id":10,"preferences":{"WP1":22.58,"WP2":5.17,"WP3":38.0,"WP4":17.15,"WP5":17.1},"treatmentEffects":{"TE1":0.1696,"TE2":-0.0974,"TE3":0.2697,"TE4":6.8465,"TE5":18005.24}},{"id":11,"preferences":{"WP1":34.62,"WP2":13.47,"WP3":22.21,"WP4":26.48,"WP5":3.22},"treatmentEffects":{"TE1":0.2695,"TE2":-0.2526,"TE3":0.4029,"TE4":7.1318,"TE5":22000.52}},{"id":12,"preferences":{"WP1":45.17,"WP2":5.81,"WP3":19.38,"WP4":24.67,"WP5":4.98},"treatmentEffects":{"TE1":0.1933,"TE2":-0.2357,"TE3":0.2351,"TE4":6.285,"TE5":16671.96}},{"id":13,"preferences":{"WP1":35.69,"WP2":6.29,"WP3":31.45,"WP4":12.35,"WP5":14.22},"treatmentEffects":{"TE1":0.2098,"TE2":-0.0858,"TE3":0.1939,"TE4":5.8812,"TE5":22000.34}},{"id":14,"preferences":{"WP1":32.66,"WP2":7.23,"WP3":38.01,"WP4":17.21,"WP5":4.89},"treatmentEffects":{"TE1":0.1967,"TE2":-0.2277,"TE3":0.307,"TE4":6.4291,"TE5":25998.88}},{"id":15,"preferences":{"WP1":28.54,"WP2":20.39,"WP3":25.71,"WP4":18.79,"WP5":6.57},"treatmentEffects":{"TE1":0.4959,"TE2":-0.2681,"TE3":0.3635,"TE4":5.9238,"TE5":19334.18}},{"id":16,"preferences":{"WP1":40.72,"WP2":10.56,"WP3":30.36,"WP4":6.24,"WP5":12.12},"treatmentEffects":{"TE1":0.2693,"TE2":-0.1379,"TE3":0.2627,"TE4":5.0032,"TE5":17998.73}},{"id":17,"preferences":{"WP1":30.46,"WP2":16.67,"WP3":20.97,"WP4":17.74,"WP5":14.16},"treatmentEffects":{"TE1":0.1396,"TE2":-0.177,"TE3":0.2132,"TE4":5.1235,"TE5":21992.39}},{"id":18,"preferences":{"WP1":41.69,"WP2":11.96,"WP3":34.53,"WP4":3.78,"WP5":8.04},"treatmentEffects":{"TE1":0.3031,"TE2":-0.2952,"TE3":0.2593,"TE4":6.4734,"TE5":16668.96}},{"id":19,"preferences":{"WP1":27.35,"WP2":26.11,"WP3":37.56,"WP4":2.33,"WP5":6.65},"treatmentEffects":{"TE1":0.2008,"TE2":-0.252,"TE3":0.4063,"TE4":8.0781,"TE5":28655.78}},{"id":20,"preferences":{"WP1":23.16,"WP2":15.26,"WP3":37.46,"WP4":17.33,"WP5":6.8},"treatmentEffects":{"TE1":0.401,"TE2":-0.2349,"TE3":0.2068,"TE4":4.3392,"TE5":14002.4}}];
 
-        // State
-        let selectedPatient = PATIENTS_DATA[0];
-        let te4Wtp = 1500;
-        let netUtility = 0;
-        let recommendation = '';
-        let contributions = {};
-        let isSensitive = false;
+        // Generate patients 21-100
+        for (var gi = 21; gi <= 100; gi++) {
+            var wp1 = +(Math.random()*40+10).toFixed(2), wp2 = +(Math.random()*20+3).toFixed(2), wp3 = +(Math.random()*35+10).toFixed(2), wp4 = +(Math.random()*25+2).toFixed(2);
+            var wp5 = +(100 - wp1 - wp2 - wp3 - wp4).toFixed(2);
+            if (wp5 < 1) { wp5 = 5; var t = wp1+wp2+wp3+wp4+wp5; wp1=+(wp1/t*100).toFixed(2); wp2=+(wp2/t*100).toFixed(2); wp3=+(wp3/t*100).toFixed(2); wp4=+(wp4/t*100).toFixed(2); wp5=+(100-wp1-wp2-wp3-wp4).toFixed(2); }
+            PATIENTS_DATA.push({id:gi, preferences:{WP1:wp1,WP2:wp2,WP3:wp3,WP4:wp4,WP5:wp5}, treatmentEffects:{TE1:+(Math.random()*0.45+0.02).toFixed(4), TE2:+(-Math.random()*0.35-0.01).toFixed(4), TE3:+(Math.random()*0.4+0.01).toFixed(4), TE4:+(Math.random()*4+4).toFixed(4), TE5:+(Math.random()*18000+10000).toFixed(2)}});
+        }
 
-        // Calculate utility
-        function calculateUtility() {
-            const { preferences, treatmentEffects } = selectedPatient;
-            const c1 = (preferences.WP1 / 100) * treatmentEffects.TE1 * 25000;
-            const c2 = (preferences.WP2 / 100) * treatmentEffects.TE2 * 15000;
-            const c3 = (preferences.WP3 / 100) * treatmentEffects.TE3 * 25000;
-            const c4 = (preferences.WP4 / 100) * (-treatmentEffects.TE4) * te4Wtp;
-            const c5 = (preferences.WP5 / 100) * (-treatmentEffects.TE5) * 1;
-
-            netUtility = c1 + c2 + c3 + c4 + c5;
-            // recommendation value is kept plain text for logic
-            const recText = netUtility > 0 ? 'Surgery' : 'Conservative Care';
-            const recColor = netUtility > 0 ? '#005a9c' : '#2d7a4f';
-            recommendation = `<span style="color: ${recColor};">${recText}</span>`;
-
-            contributions = {
-                pain: c1,
-                treatmentPain: c2,
-                function: c3,
-                rehabTime: c4,
-                cost: c5
+        const PATIENT_DEMOGRAPHICS = {
+            1: {age:58,sex:'Female',bmi:28.4,diagnosis:'Knee Osteoarthritis',severity:'Moderate-Severe',duration:'3 years',painVas:7,odiScore:42,priorTreatments:['Physical Therapy','NSAIDs','Cortisone Injections'],imaging:'MRI: Grade III cartilage loss, medial compartment',comorbidities:['Hypertension','Type 2 Diabetes'],insurance:'Medicare'},
+            2: {age:45,sex:'Male',bmi:31.2,diagnosis:'Lumbar Disc Herniation',severity:'Severe',duration:'8 months',painVas:8,odiScore:56,priorTreatments:['Physical Therapy','Epidural Steroid Injection'],imaging:'MRI: L4-L5 disc herniation with nerve impingement',comorbidities:['Obesity'],insurance:'Private PPO'},
+            3: {age:62,sex:'Female',bmi:25.1,diagnosis:'Rotator Cuff Tear',severity:'Moderate',duration:'14 months',painVas:6,odiScore:38,priorTreatments:['Physical Therapy','NSAIDs'],imaging:'MRI: Partial-thickness tear, supraspinatus',comorbidities:['Osteoporosis'],insurance:'Medicare'},
+            4: {age:52,sex:'Male',bmi:27.8,diagnosis:'Knee Osteoarthritis',severity:'Moderate',duration:'2 years',painVas:6,odiScore:35,priorTreatments:['Physical Therapy','Hyaluronic Acid Injection'],imaging:'MRI: Grade II-III cartilage loss, bilateral',comorbidities:[],insurance:'Private HMO'},
+            5: {age:68,sex:'Female',bmi:30.5,diagnosis:'Spinal Stenosis',severity:'Moderate',duration:'4 years',painVas:7,odiScore:48,priorTreatments:['Physical Therapy','Epidural Steroid Injection','NSAIDs'],imaging:'MRI: Central canal stenosis L3-L5',comorbidities:['Hypertension','GERD'],insurance:'Medicare'},
+        };
+        for (var i = 6; i <= 100; i++) {
+            PATIENT_DEMOGRAPHICS[i] = {
+                age: 40 + Math.floor(Math.random() * 30), sex: Math.random() > 0.5 ? 'Male' : 'Female',
+                bmi: +(22 + Math.random() * 13).toFixed(1),
+                diagnosis: ['Knee Osteoarthritis','Lumbar Disc Herniation','Rotator Cuff Tear','Spinal Stenosis','Hip Osteoarthritis'][Math.floor(Math.random()*5)],
+                severity: ['Mild','Moderate','Moderate-Severe','Severe'][Math.floor(Math.random()*4)],
+                duration: Math.floor(Math.random()*5+1)+' years', painVas: Math.floor(Math.random()*4)+5,
+                odiScore: Math.floor(Math.random()*30)+25,
+                priorTreatments: ['Physical Therapy','NSAIDs','Cortisone Injections'].slice(0, Math.floor(Math.random()*3)+1),
+                imaging: 'MRI: Moderate degenerative changes noted',
+                comorbidities: [['Hypertension'],['Type 2 Diabetes'],['Obesity'],[]][Math.floor(Math.random()*4)],
+                insurance: ['Medicare','Private PPO','Private HMO','Medicaid'][Math.floor(Math.random()*4)]
             };
         }
 
+
+
+        var currentScreen = 'input';
+        var selectedPatient = PATIENTS_DATA[0];
+        var inputData = {};
+        var chipValues = { painRelief: 25, treatmentPain: 6, function: 32, recoveryTime: 26, cost: 11 };
+        var te4Wtp = 1500, netUtility = 0, recommendation = '', contributions = {}, isSensitive = false;
+
+        function loadInputFromPatient() {
+            var demo = PATIENT_DEMOGRAPHICS[selectedPatient.id];
+            var pref = selectedPatient.preferences;
+            inputData = {};
+            for (var k in demo) inputData[k] = demo[k];
+            chipValues = { painRelief: Math.round(pref.WP1), treatmentPain: Math.round(pref.WP2), function: Math.round(pref.WP3), recoveryTime: Math.round(pref.WP4), cost: Math.round(pref.WP5) };
+        }
+        loadInputFromPatient();
+
+        function calculateUtility() {
+            const p = selectedPatient.preferences, t = selectedPatient.treatmentEffects;
+            const c1=(p.WP1/100)*t.TE1*25000, c2=(p.WP2/100)*t.TE2*15000, c3=(p.WP3/100)*t.TE3*25000, c4=(p.WP4/100)*(-t.TE4)*te4Wtp, c5=(p.WP5/100)*(-t.TE5)*1;
+            netUtility = c1+c2+c3+c4+c5;
+            recommendation = netUtility > 0 ? 'Surgery' : 'Conservative Care';
+            contributions = { pain:c1, treatmentPain:c2, function:c3, rehabTime:c4, cost:c5 };
+        }
         function calcUtilityAt(wtp) {
-            const { preferences, treatmentEffects } = selectedPatient;
-            return (
-                (preferences.WP1 / 100) * treatmentEffects.TE1 * 25000 +
-                (preferences.WP2 / 100) * treatmentEffects.TE2 * 15000 +
-                (preferences.WP3 / 100) * treatmentEffects.TE3 * 25000 +
-                (preferences.WP4 / 100) * (-treatmentEffects.TE4) * wtp +
-                (preferences.WP5 / 100) * (-treatmentEffects.TE5) * 1
-            );
+            const p = selectedPatient.preferences, t = selectedPatient.treatmentEffects;
+            return (p.WP1/100)*t.TE1*25000+(p.WP2/100)*t.TE2*15000+(p.WP3/100)*t.TE3*25000+(p.WP4/100)*(-t.TE4)*wtp+(p.WP5/100)*(-t.TE5)*1;
+        }
+        function checkSensitivity() { isSensitive = (calcUtilityAt(500) > 0) !== (calcUtilityAt(2500) > 0); }
+        function getChipTotal() { return chipValues.painRelief + chipValues.treatmentPain + chipValues.function + chipValues.recoveryTime + chipValues.cost; }
+
+        function renderInputScreen() {
+            var total = getChipTotal(), isValid = total === 100;
+
+            document.getElementById('app').innerHTML =
+            '<div class="header">' +
+                '<h1>MSK Treatment Decision Support</h1>' +
+                '<div class="header-sub">Clinical Decision Support System -- Shared Decision Making Tool</div>' +
+                '<div class="header-controls">' +
+                    '<label>Patient:</label>' +
+                    '<select id="patientSelectInput" onchange="handlePatientChangeInput(event)">' +
+                        PATIENTS_DATA.map(function(p){return '<option value="'+p.id+'" '+(p.id===selectedPatient.id?'selected':'')+'>Patient '+p.id+'</option>';}).join('') +
+                    '</select>' +
+                    '<button class="active-tab">Patient View</button>' +
+                    '<button onclick="' + (isValid ? 'generateRecommendation()' : '') + '">Treatment Decision View</button>' +
+                '</div>' +
+            '</div>' +
+
+            '<div style="max-width:600px">' +
+                '<div class="box">' +
+                    '<h2>Treatment Preference Survey</h2>' +
+
+                    '<div class="chip-row"><label>Long-term Pain Relief</label><input type="range" min="0" max="60" value="' + chipValues.painRelief + '" oninput="updateChip(\'painRelief\',this.value)"><span class="chip-value" id="chip_painRelief">' + chipValues.painRelief + '</span></div>' +
+                    '<div style="font-size:10px;color:#999;margin:-6px 0 10px 148px">How important is reducing your daily pain?</div>' +
+
+                    '<div class="chip-row"><label>Treatment Pain/Risk</label><input type="range" min="0" max="60" value="' + chipValues.treatmentPain + '" oninput="updateChip(\'treatmentPain\',this.value)"><span class="chip-value" id="chip_treatmentPain">' + chipValues.treatmentPain + '</span></div>' +
+                    '<div style="font-size:10px;color:#999;margin:-6px 0 10px 148px">How much do you want to avoid treatment side effects?</div>' +
+
+                    '<div class="chip-row"><label>Function / Mobility</label><input type="range" min="0" max="60" value="' + chipValues.function + '" oninput="updateChip(\'function\',this.value)"><span class="chip-value" id="chip_function">' + chipValues.function + '</span></div>' +
+                    '<div style="font-size:10px;color:#999;margin:-6px 0 10px 148px">How important is getting back to daily activities?</div>' +
+
+                    '<div class="chip-row"><label>Recovery Time</label><input type="range" min="0" max="60" value="' + chipValues.recoveryTime + '" oninput="updateChip(\'recoveryTime\',this.value)"><span class="chip-value" id="chip_recoveryTime">' + chipValues.recoveryTime + '</span></div>' +
+                    '<div style="font-size:10px;color:#999;margin:-6px 0 10px 148px">How important is a shorter recovery period?</div>' +
+
+                    '<div class="chip-row"><label>Out-of-Pocket Cost</label><input type="range" min="0" max="60" value="' + chipValues.cost + '" oninput="updateChip(\'cost\',this.value)"><span class="chip-value" id="chip_cost">' + chipValues.cost + '</span></div>' +
+                    '<div style="font-size:10px;color:#999;margin:-6px 0 10px 148px">How important is keeping costs low?</div>' +
+
+                    '<div class="chip-total" id="chipTotal">Total: ' + total + ' / 100 ' + (isValid ? '' : '(must equal 100)') + '</div>' +
+                '</div>' +
+
+                '<div class="box" style="background:#f8f8f8">' +
+                    '<h2>How This Is Used</h2>' +
+                    '<div style="font-size:11px;line-height:1.6">' +
+                        '<div>We use your answers to compare treatment options based on what matters most to you.</div>' +
+                        '<div style="margin-top:4px">Your care giver will go over the results with you so you can decide together on the best plan.</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+
+            '<button class="generate-btn" style="max-width:600px" onclick="generateRecommendation()" ' + (isValid ? '' : 'disabled') + '>View Treatment Decision</button>';
         }
 
-        function checkSensitivity() {
-            const u1 = calcUtilityAt(500);
-            const u2 = calcUtilityAt(2500);
-            isSensitive = (u1 > 0) !== (u2 > 0);
-        }
-
-        function render() {
-            calculateUtility();
-            checkSensitivity();
+        function renderSdmScreen() {
+            calculateUtility(); checkSensitivity();
 
             const te = selectedPatient.treatmentEffects;
             const pref = selectedPatient.preferences;
@@ -245,11 +180,11 @@
             ];
 
             const contribData = [
-                { label: 'Pain Relief', value: contributions.pain },
-                { label: 'Treatment Pain', value: contributions.treatmentPain },
-                { label: 'Function', value: contributions.function },
-                { label: 'Recovery Time', value: contributions.rehabTime },
-                { label: 'Cost', value: contributions.cost }
+                {label: 'Pain Relief', value: contributions.pain},
+                {label: 'Treatment Pain', value: contributions.treatmentPain},
+                {label: 'Function', value: contributions.function},
+                {label: 'Recovery Time', value: contributions.rehabTime},
+                {label: 'Cost', value: contributions.cost}
             ];
 
             const maxAbs = Math.max(...contribData.map(c => Math.abs(c.value)));
@@ -257,24 +192,26 @@
             const topPriority = Math.max(pref.WP1, pref.WP3, pref.WP4, pref.WP5);
             const topPriorityName =
                 pref.WP3 === topPriority ? 'function' :
-                    pref.WP4 === topPriority ? 'recovery time' :
-                        pref.WP1 === topPriority ? 'pain relief' : 'cost';
+                pref.WP4 === topPriority ? 'recovery time' :
+                pref.WP1 === topPriority ? 'pain relief' : 'cost';
 
             document.getElementById('app').innerHTML = `
                 <div class="header">
                     <h1>MSK Treatment Decision Support</h1>
+                    <div class="header-sub">Clinical Decision Support System -- Shared Decision Making Tool</div>
                     <div class="header-controls">
                         <label>Patient:</label>
                         <select id="patientSelect" onchange="handlePatientChange(event)">
                             ${PATIENTS_DATA.map(p => `<option value="${p.id}" ${p.id === selectedPatient.id ? 'selected' : ''}>Patient ${p.id}</option>`).join('')}
                         </select>
+                        <button onclick="switchScreen('input')">Patient View</button>
+                        <button class="active-tab">Treatment Decision View</button>
                     </div>
                 </div>
 
                 <div class="two-columns">
-                    <!-- LEFT: Patient View -->
+                    <!-- LEFT COLUMN -->
                     <div>
-                        <!-- Patient Priorities -->
                         <div class="box">
                             <h2>Patient Priorities</h2>
                             <div style="font-size: 12px; color: #666; margin-bottom: 12px;">
@@ -293,10 +230,9 @@
                             `).join('')}
                         </div>
 
-                        <!-- Suggested Treatment -->
                         <div class="box">
                             <h2>Suggested Treatment</h2>
-                            <div class="recommendation-box">${recommendation}</div>
+                            <div class="recommendation-box" style="color: #2c5f6f;">${recommendation}</div>
                             <div style="font-size: 13px; line-height: 1.6;">
                                 <div><strong>Confidence:</strong> ${confidence}</div>
                                 ${isBorderline ? `
@@ -307,7 +243,6 @@
                             </div>
                         </div>
 
-                        <!-- Treatment Comparison -->
                         <div class="box">
                             <h2 style="margin-bottom: 15px;">Treatment Comparison</h2>
                             <div class="treatment-columns">
@@ -333,32 +268,31 @@
                             <div style="border: 1px solid #999; background: #f8f8f8; padding: 10px; font-size: 11px;">
                                 <div style="font-weight: bold; margin-bottom: 5px;">Key Differences:</div>
                                 <div style="line-height: 1.6;">
-                                    ${te.TE1 > 0.05 ? `<div>• Pain: Surgery ${te.TE1 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE1 * 10).toFixed(1)} points)</div>` : ''}
-                                    ${te.TE3 > 0.05 ? `<div>• Function: Surgery ${te.TE3 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE3 * 10).toFixed(1)} points)</div>` : ''}
-                                    ${te.TE4 > 1 ? `<div>• Recovery: Surgery +${te.TE4.toFixed(0)} more weeks</div>` : ''}
-                                    ${te.TE5 > 2000 ? `<div>• Cost: Surgery +$${(te.TE5 / 1000).toFixed(0)}K more</div>` : ''}
+                                    ${te.TE1 > 0.05 ? `<div>&#8226; Pain: Surgery ${te.TE1 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE1 * 10).toFixed(1)} points)</div>` : ''}
+                                    ${te.TE3 > 0.05 ? `<div>&#8226; Function: Surgery ${te.TE3 > 0 ? 'better' : 'worse'} (${Math.abs(te.TE3 * 10).toFixed(1)} points)</div>` : ''}
+                                    ${te.TE4 > 1 ? `<div>&#8226; Recovery: Surgery +${te.TE4.toFixed(0)} more weeks</div>` : ''}
+                                    ${te.TE5 > 2000 ? `<div>&#8226; Cost: Surgery +$${(te.TE5/1000).toFixed(0)}K more</div>` : ''}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RIGHT: Clinician View -->
+                    <!-- RIGHT COLUMN -->
                     <div>
-                        <!-- Outcome Contributions -->
                         <div class="box" style="background: #f8f8f8;">
                             <h2>Outcome Contributions</h2>
                             <div style="font-size: 12px; color: #666; margin-bottom: 12px;">
                                 How each outcome influences the recommendation:
                             </div>
                             ${contribData.map(c => {
-                const absValue = Math.abs(c.value);
-                const widthPercent = maxAbs > 0 ? (absValue / maxAbs) * 100 : 0;
-                const favorsSurgery = c.value > 0;
-                return `
+                                const absValue = Math.abs(c.value);
+                                const widthPercent = maxAbs > 0 ? (absValue / maxAbs) * 100 : 0;
+                                const favorsSurgery = c.value > 0;
+                                return `
                                     <div class="contrib-bar">
                                         <div class="contrib-label">
                                             <span>${c.label}</span>
-                                            <span style="font-weight: bold; color: ${favorsSurgery ? '#005a9c' : '#2d7a4f'};">
+                                            <span style="font-weight: bold; color: ${favorsSurgery ? '#2d7a4f' : '#8b4513'};">
                                                 ${favorsSurgery ? 'Favors Surgery' : 'Favors Conservative'}
                                             </span>
                                         </div>
@@ -367,14 +301,13 @@
                                         </div>
                                     </div>
                                 `;
-            }).join('')}
+                            }).join('')}
                             <div style="border: 2px solid #000; padding: 10px; background: white; margin-top: 15px;">
                                 <div style="font-size: 13px; font-weight: bold;">Overall: ${recommendation}</div>
                                 <div style="font-size: 11px; margin-top: 3px; color: #666;">Based on weighted patient priorities and treatment effects</div>
                             </div>
                         </div>
 
-                        <!-- How This Was Calculated -->
                         <div class="box" style="background: white;">
                             <h2>How This Was Calculated</h2>
                             <div style="font-size: 12px; line-height: 1.7; color: #333;">
@@ -392,7 +325,6 @@
                             </div>
                         </div>
 
-                        <!-- Sensitivity Analysis -->
                         <div class="box">
                             <h2>Sensitivity Analysis</h2>
                             <div style="font-size: 12px; margin-bottom: 10px;">
@@ -409,9 +341,9 @@
                             </div>
                             <div style="border: ${isSensitive ? '2px solid #d4a017' : '1px solid #333'}; background: ${isSensitive ? '#fef9e7' : '#f8f8f8'}; padding: 10px; font-size: 12px;">
                                 ${isSensitive ?
-                    `<div>Recommendation changes with time valuation (try moving slider)</div>` :
-                    `<div>Recommendation stays ${recommendation} regardless of time valuation</div>`
-                }
+                                    '<div><strong>&#9888;&#65039; Sensitive:</strong> Recommendation changes with time valuation (try moving slider)</div>' :
+                                    `<div><strong>&#10003; Stable:</strong> Recommendation stays ${recommendation} regardless of time valuation</div>`
+                                }
                             </div>
                         </div>
                     </div>
@@ -419,20 +351,24 @@
             `;
         }
 
-        function handlePatientChange(event) {
-            const patientId = parseInt(event.target.value);
-            selectedPatient = PATIENTS_DATA.find(p => p.id === patientId);
-            render();
+        function render() { if (currentScreen==='input') renderInputScreen(); else renderSdmScreen(); }
+        function switchScreen(s) { currentScreen=s; render(); }
+        function handlePatientChangeInput(e) { selectedPatient=PATIENTS_DATA.find(function(p){return p.id===parseInt(e.target.value)}); loadInputFromPatient(); render(); }
+        function handlePatientChange(e) { selectedPatient=PATIENTS_DATA.find(function(p){return p.id===parseInt(e.target.value)}); loadInputFromPatient(); render(); }
+        function handleSliderChange(e) { te4Wtp=parseInt(e.target.value); render(); }
+        function updateChip(key, value) {
+            chipValues[key]=parseInt(value);
+            document.getElementById('chip_'+key).textContent=value;
+            var total=getChipTotal(), isValid=total===100;
+            document.getElementById('chipTotal').textContent='Total: '+total+' / 100 '+(isValid?'':'(must equal 100)');
+            var btn=document.querySelector('.generate-btn'); if(btn) btn.disabled=!isValid;
         }
-
-        function handleSliderChange(event) {
-            te4Wtp = parseInt(event.target.value);
-            render();
+        function generateRecommendation() {
+            selectedPatient.preferences.WP1=chipValues.painRelief; selectedPatient.preferences.WP2=chipValues.treatmentPain;
+            selectedPatient.preferences.WP3=chipValues.function; selectedPatient.preferences.WP4=chipValues.recoveryTime;
+            selectedPatient.preferences.WP5=chipValues.cost; currentScreen='sdm'; render();
         }
-
-        // Initial render
         render();
     </script>
 </body>
-
 </html>
